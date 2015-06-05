@@ -7,7 +7,4 @@ setup(name='openstep_parser',
       url="http://github.com/kronenthaler/openstep-parser",
       version='1.0',
       license='BSD License',
-      requires=[
-          'nose',
-      ],
       packages=find_packages(exclude=['tests']))

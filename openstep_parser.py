@@ -22,3 +22,141 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import re
+
+class OpenStepDecoder:
+    @classmethod
+    def ParseFromFile(cls, fp):
+        return cls.ParseFromString(fp.read())
+
+    @classmethod
+    def ParseFromString(cls, str):
+        return OpenStepDecoder()._parse(str, 0)
+
+    def _parse(self, str, index):
+        """
+        dictionary ::= ^{(.*)}$
+        dictionary-entry ::= ^\s*(.*)=(.*);\s*$
+        dictionary-entry-key ::=
+        dictionary-entry-value ::=
+
+        """
+
+        pass
+
+    def _parse_dictionary(self, str, index):
+        object = {}
+
+        if str[index] != '{':
+            raise Exception("Expected { as dictionary start")
+
+        index = self._parse_padding(str, index + 1)
+
+        while str[index] != '}':
+            index = self._parse_dictionary_entry(str, index, object)
+
+        index = self._parse_padding(str, index + 1)
+
+        return object, index
+
+    def _parse_array(self, str, index):
+        object = []
+
+        if str[index] != '(':
+            raise Exception("Expected { as dictionary start")
+
+        index = self._parse_padding(str, index + 1)
+        while str[index] != ')':
+            value, index = self._parse_array_entry(str, index, object)
+
+        index = self._parse_padding(str, index + 1)
+
+        return object, index
+
+    def _parse_dictionary_entry(self, str, index, dictionary):
+        # adds a entry to the given dictionary
+        key, index = self._parse_key(str, index)
+
+        if str[index] != '=':
+            raise Exception("Expected = after a key.")
+
+        value, index = self._parse_value(str, index)
+
+        if str[index] != ';':
+            raise Exception("Expected ; after a value.")
+
+        dictionary[key] = value
+
+        return index + 1
+
+    def _parse_array_entry(self, str, index, array):
+        # parse a: dict, array or value until the ','
+        value, index = self._parse_value(str, index)
+
+        if str[index] != ',':
+            raise Exception("Expected ; after a value.")
+
+        array.append(value)
+        return index + 1
+
+    def _parse_padding(self, str, index):
+        index = self._ignore_whitespaces(str, index)
+        index = self._ignore_comment(str, index)
+        index = self._ignore_whitespaces(str, index)
+        return index
+
+    def _parse_key(self, str, index):
+        # returns the key and the last index.
+        index = self._parse_padding(str, index)
+
+        key = ''
+        while(index < len(str) and not self._is_whitespace(str[index])):
+            key = key + str[index]
+            index = index + 1
+
+        index = self._parse_padding(str, index)
+        key = re.sub(r'^"', '', key)
+        key = re.sub(r'"$', '', key)
+        return key, index
+
+    def _parse_value(self, str, index):
+        # return an object depending on the value of the first character.
+        index = self._parse_padding(str, index + 1)
+
+        if str[index] == '{' :
+            value, index = self._parse_dictionary(str, index)
+        elif str[index] == '(':
+            value, index = self._parse_array(str, index)
+        else:
+            value, index = self._parse_key(str, index)
+
+        return value, index
+
+    def _ignore_comment(self, str, index):
+        # moves the index, to the next character after the close of the comment
+
+        if index >= len(str) or (str[index] != '/' and str[index+1] != '*') :
+            return index
+
+        # move after the first character in the comment
+        index = index + 2
+
+        while(str[index] != '*' and str[index+1] != '/'):
+            index = index + 1
+
+        # move after the first character after the comment
+        index = index + 2
+
+        return index
+
+    def _ignore_whitespaces(self, str, index):
+        while(index < len(str) and self._is_whitespace(str[index])):
+            index = index + 1
+
+        return index
+
+    def _is_whitespace(self, char):
+        return char == ' ' or \
+               char == '\t' or \
+               char == '\n' or \
+               char == '\r'
