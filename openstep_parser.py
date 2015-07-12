@@ -31,21 +31,20 @@ class OpenStepDecoder:
 
     @classmethod
     def ParseFromString(cls, str):
-        return OpenStepDecoder()._parse(str, 0)
+        return OpenStepDecoder()._parse(str)
 
-    def _parse(self, str, index):
-        """
-        dictionary ::= ^{(.*)}$
-        dictionary-entry ::= ^\s*(.*)=(.*);\s*$
-        dictionary-entry-key ::=
-        dictionary-entry-value ::=
+    def _parse(self, str):
+        # parse the comment if any
+        index = 0
+        if str[0] == '/' and str[1] == '/':
+            while str[index] != '{':
+                index += 1
 
-        """
-
-        pass
+        result, index = self._parse_dictionary(str, index)
+        return result
 
     def _parse_dictionary(self, str, index):
-        object = {}
+        obj = {}
 
         if str[index] != '{':
             raise Exception("Expected { as dictionary start")
@@ -53,37 +52,39 @@ class OpenStepDecoder:
         index = self._parse_padding(str, index + 1)
 
         while str[index] != '}':
-            index = self._parse_dictionary_entry(str, index, object)
+            index = self._parse_dictionary_entry(str, index, obj)
+            index = self._parse_padding(str, index)
 
         index = self._parse_padding(str, index + 1)
 
-        return object, index
+        return obj, index
 
     def _parse_array(self, str, index):
-        object = []
+        obj = []
 
         if str[index] != '(':
-            raise Exception("Expected { as dictionary start")
+            raise Exception("Expected ( as dictionary start")
 
         index = self._parse_padding(str, index + 1)
         while str[index] != ')':
-            value, index = self._parse_array_entry(str, index, object)
+            index = self._parse_array_entry(str, index, obj)
+            index = self._parse_padding(str, index)
 
         index = self._parse_padding(str, index + 1)
 
-        return object, index
+        return obj, index
 
     def _parse_dictionary_entry(self, str, index, dictionary):
         # adds a entry to the given dictionary
         key, index = self._parse_key(str, index)
 
         if str[index] != '=':
-            raise Exception("Expected = after a key.")
+            raise Exception("Expected = after a key. Found {1} @ {0}".format(index, str[index]))
 
         value, index = self._parse_value(str, index)
 
         if str[index] != ';':
-            raise Exception("Expected ; after a value.")
+            raise Exception("Expected ; after a value. Found {1} @ {0}".format(index, str[index]))
 
         dictionary[key] = value
 
@@ -94,7 +95,7 @@ class OpenStepDecoder:
         value, index = self._parse_value(str, index)
 
         if str[index] != ',':
-            raise Exception("Expected ; after a value.")
+            raise Exception("Expected , after a value. Found {1} @ {0} = {2}".format(index, str[index], value))
 
         array.append(value)
         return index + 1
@@ -110,9 +111,32 @@ class OpenStepDecoder:
         index = self._parse_padding(str, index)
 
         key = ''
-        while(index < len(str) and not self._is_whitespace(str[index])):
-            key = key + str[index]
-            index = index + 1
+        while index < len(str) and not self._is_whitespace(str[index]) and str[index] != ';':
+            key += str[index]
+            index += 1
+
+        index = self._parse_padding(str, index)
+        key = re.sub(r'^"', '', key)
+        key = re.sub(r'"$', '', key)
+        return key, index
+
+    def _parse_literal(self, str, index):
+        # returns the key and the last index.
+        index = self._parse_padding(str, index)
+        key = ''
+
+        if str[index] == '"':
+            index += 1
+            # if the literal starts with " then spaces are allowed
+            while index < len(str) and str[index] != '"':
+                key += str[index]
+                index += 1
+            index += 1
+        else:
+            # otherwise stop in the spaces.
+            while index < len(str) and not self._is_whitespace(str[index]) and str[index] != ';' and str[index] != ',':
+                key += str[index]
+                index += 1
 
         index = self._parse_padding(str, index)
         key = re.sub(r'^"', '', key)
@@ -123,35 +147,35 @@ class OpenStepDecoder:
         # return an object depending on the value of the first character.
         index = self._parse_padding(str, index + 1)
 
-        if str[index] == '{' :
+        if str[index] == '{':
             value, index = self._parse_dictionary(str, index)
         elif str[index] == '(':
             value, index = self._parse_array(str, index)
         else:
-            value, index = self._parse_key(str, index)
+            value, index = self._parse_literal(str, index)
 
         return value, index
 
     def _ignore_comment(self, str, index):
         # moves the index, to the next character after the close of the comment
 
-        if index >= len(str) or (str[index] != '/' and str[index+1] != '*') :
+        if index+1 >= len(str) or (str[index] != '/' and str[index+1] != '*'):
             return index
 
         # move after the first character in the comment
-        index = index + 2
+        index += 2
 
-        while(str[index] != '*' and str[index+1] != '/'):
-            index = index + 1
+        while str[index] != '*' and str[index+1] != '/':
+            index += 1
 
         # move after the first character after the comment
-        index = index + 2
+        index += 2
 
         return index
 
     def _ignore_whitespaces(self, str, index):
-        while(index < len(str) and self._is_whitespace(str[index])):
-            index = index + 1
+        while index < len(str) and self._is_whitespace(str[index]):
+            index += 1
 
         return index
 

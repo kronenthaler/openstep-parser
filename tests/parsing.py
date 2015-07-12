@@ -26,6 +26,27 @@ import unittest
 import openstep_parser as osp
 
 class Parsing(unittest.TestCase):
+    def testParseNestedDictionary(self):
+        line = '''{ a = { b = b1; }; };'''
+        result = osp.OpenStepDecoder()._parse_dictionary(line, 0)
+        assert result
+
+    def testParseFileSample1(self):
+        result = osp.OpenStepDecoder.ParseFromFile(open('samples/music-cube.pbxproj'))
+        assert result
+
+    def testParseFileSample2(self):
+        result = osp.OpenStepDecoder.ParseFromFile(open('samples/cloud-search.pbxproj'))
+        assert result
+
+    def testParseFileSample3(self):
+        result = osp.OpenStepDecoder.ParseFromFile(open('samples/collection-view.pbxproj'))
+        assert result
+
+    def testParseFileSample4(self):
+        result = osp.OpenStepDecoder.ParseFromFile(open('samples/metal-image-processing.pbxproj'))
+        assert result
+
     def testIgnoreWhitespacesFromBeginning(self):
         parser = osp.OpenStepDecoder()
         index = parser._ignore_whitespaces('   3 ', 0)
@@ -99,6 +120,13 @@ class Parsing(unittest.TestCase):
         index = parser._parse_array_entry(line, 0, result)
         assert result[0] == 'KEY-NAME'
         assert len(result) == 1
+
+    def testParseWithComment(self):
+        line = '// utf-8 \n{}'
+        expected = {}
+        result = osp.OpenStepDecoder.ParseFromString(line)
+        assert result == expected
+
 
 if __name__ == '__main__':
     unittest.main()
