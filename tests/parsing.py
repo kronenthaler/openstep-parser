@@ -23,7 +23,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import unittest
-import openstep_parser as osp
+
+from openstep_parser import openstep_parser as osp
+
 
 class Parsing(unittest.TestCase):
     def testParseNestedDictionary(self):
