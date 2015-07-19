@@ -24,6 +24,7 @@
 
 import re
 
+
 class OpenStepDecoder:
     @classmethod
     def ParseFromFile(cls, fp):
@@ -81,13 +82,13 @@ class OpenStepDecoder:
         if str[index] != '=':
             raise Exception("Expected = after a key. Found {1} @ {0}".format(index, str[index]))
 
+        index = self._parse_padding(str, index + 1)
         value, index = self._parse_value(str, index)
 
         if str[index] != ';':
             raise Exception("Expected ; after a value. Found {1} @ {0}".format(index, str[index]))
 
         dictionary[key] = value
-
         return index + 1
 
     def _parse_array_entry(self, str, index, array):
@@ -145,7 +146,6 @@ class OpenStepDecoder:
 
     def _parse_value(self, str, index):
         # return an object depending on the value of the first character.
-        index = self._parse_padding(str, index + 1)
 
         if str[index] == '{':
             value, index = self._parse_dictionary(str, index)
@@ -159,13 +159,13 @@ class OpenStepDecoder:
     def _ignore_comment(self, str, index):
         # moves the index, to the next character after the close of the comment
 
-        if index+1 >= len(str) or (str[index] != '/' and str[index+1] != '*'):
+        if index + 1 >= len(str) or (str[index] != '/' and str[index + 1] != '*'):
             return index
 
         # move after the first character in the comment
         index += 2
 
-        while str[index] != '*' and str[index+1] != '/':
+        while str[index] != '*' and str[index + 1] != '/':
             index += 1
 
         # move after the first character after the comment
