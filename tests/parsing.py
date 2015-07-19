@@ -121,6 +121,18 @@ class Parsing(unittest.TestCase):
         assert result[0] == 'KEY-NAME'
         assert len(result) == 1
 
+    def testFullArray(self):
+        parser = osp.OpenStepDecoder()
+        line = '( ' \
+               '    ABC,' \
+               '    DEF,' \
+               '    GHI,' \
+               ')'
+        result, index = parser._parse_array(line, 0)
+        assert result[0] == 'ABC'
+        assert result[1] == 'DEF'
+        assert result[2] == 'GHI'
+
     def testParseWithComment(self):
         line = '// utf-8 \n{}'
         expected = {}
