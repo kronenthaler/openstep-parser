@@ -87,9 +87,9 @@ class Parsing(unittest.TestCase):
 
     def testParsingKeyQuoted(self):
         parser = osp.OpenStepDecoder()
-        line = '    /* some comments */ "KEY-NAME" '
+        line = '    /* some comments */ "KEY-\\"NAME\\"" '
         key, index = parser._parse_key(line, 0)
-        assert key == 'KEY-NAME'
+        assert key == 'KEY-\\"NAME\\"'
         assert index == len(line)
 
     def testDictionaryEntry(self):

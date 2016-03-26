@@ -129,7 +129,12 @@ class OpenStepDecoder:
         if str[index] == '"':
             index += 1
             # if the literal starts with " then spaces are allowed
-            while index < len(str) and str[index] != '"':
+            escaped = False
+            while index < len(str) and (escaped or str[index] != '"'):
+                if not escaped and str[index] == '\\':
+                    escaped = True
+                else:
+                    escaped = False
                 key += str[index]
                 index += 1
             index += 1
@@ -140,8 +145,6 @@ class OpenStepDecoder:
                 index += 1
 
         index = self._parse_padding(str, index)
-        key = re.sub(r'^"', '', key)
-        key = re.sub(r'"$', '', key)
         return key, index
 
     def _parse_value(self, str, index):
