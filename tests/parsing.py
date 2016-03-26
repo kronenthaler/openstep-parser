@@ -70,8 +70,8 @@ class Parsing(unittest.TestCase):
 
     def testIgnoreComment(self):
         parser = osp.OpenStepDecoder()
-        index = parser._ignore_comment('/*1234567890*/ ', 0)
-        assert index == 14
+        index = parser._ignore_comment('/*12345/67890*/ ', 0)
+        assert index == 15
 
     def testIgnoreFakeComment(self):
         parser = osp.OpenStepDecoder()

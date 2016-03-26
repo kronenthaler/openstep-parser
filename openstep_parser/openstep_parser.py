@@ -165,7 +165,7 @@ class OpenStepDecoder:
         # move after the first character in the comment
         index += 2
 
-        while str[index] != '*' and str[index + 1] != '/':
+        while not (str[index] == '*' and str[index + 1] == '/'):
             index += 1
 
         # move after the first character after the comment
