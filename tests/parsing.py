@@ -87,9 +87,9 @@ class Parsing(unittest.TestCase):
 
     def testParsingKeyQuoted(self):
         parser = osp.OpenStepDecoder()
-        line = '    /* some comments */ "KEY-\\"NAME\\"" '
+        line = '    /* some comments */ "KEY-NAME" '
         key, index = parser._parse_key(line, 0)
-        assert key == 'KEY-\\"NAME\\"'
+        assert key == 'KEY-NAME'
         assert index == len(line)
 
     def testDictionaryEntry(self):
@@ -99,6 +99,14 @@ class Parsing(unittest.TestCase):
         index = parser._parse_dictionary_entry(line, 0, result)
 
         assert result['KEY-NAME'] == 'value-1234'
+
+    def testDictionaryEntryQuoted(self):
+        parser = osp.OpenStepDecoder()
+        line = '    /* some comments */ KEY-NAME   /* asd */ =   /* adfasdf */  "value\\n\\"1234\\""    /* adfasdf */   ;'
+        result = {}
+        index = parser._parse_dictionary_entry(line, 0, result)
+
+        assert result['KEY-NAME'] == 'value\n"1234"'
 
     def testDictionaryEntryMissingEqual(self):
         parser = osp.OpenStepDecoder()
