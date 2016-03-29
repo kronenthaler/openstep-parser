@@ -70,8 +70,8 @@ class Parsing(unittest.TestCase):
 
     def testIgnoreComment(self):
         parser = osp.OpenStepDecoder()
-        index = parser._ignore_comment('/*1234567890*/ ', 0)
-        assert index == 14
+        index = parser._ignore_comment('/*12345/67890*/ ', 0)
+        assert index == 15
 
     def testIgnoreFakeComment(self):
         parser = osp.OpenStepDecoder()
@@ -99,6 +99,14 @@ class Parsing(unittest.TestCase):
         index = parser._parse_dictionary_entry(line, 0, result)
 
         assert result['KEY-NAME'] == 'value-1234'
+
+    def testDictionaryEntryQuoted(self):
+        parser = osp.OpenStepDecoder()
+        line = '    /* some comments */ KEY-NAME   /* asd */ =   /* adfasdf */  "value\\n\\"1234\\""    /* adfasdf */   ;'
+        result = {}
+        index = parser._parse_dictionary_entry(line, 0, result)
+
+        assert result['KEY-NAME'] == 'value\n"1234"'
 
     def testDictionaryEntryMissingEqual(self):
         parser = osp.OpenStepDecoder()

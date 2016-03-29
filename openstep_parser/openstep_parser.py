@@ -129,8 +129,17 @@ class OpenStepDecoder:
         if str[index] == '"':
             index += 1
             # if the literal starts with " then spaces are allowed
-            while index < len(str) and str[index] != '"':
-                key += str[index]
+            escaped = False
+            while index < len(str) and (escaped or str[index] != '"'):
+                d = {'"': '"', "'": "'", "0": "\0", "\\": "\\", "n":"\n"}
+                if escaped:
+                    key += d[str[index]]
+                    escaped = False
+                elif not escaped and str[index] == '\\':
+                    escaped = True
+                else:
+                    key += str[index]
+                    escaped = False
                 index += 1
             index += 1
         else:
@@ -140,8 +149,6 @@ class OpenStepDecoder:
                 index += 1
 
         index = self._parse_padding(str, index)
-        key = re.sub(r'^"', '', key)
-        key = re.sub(r'"$', '', key)
         return key, index
 
     def _parse_value(self, str, index):
@@ -165,7 +172,7 @@ class OpenStepDecoder:
         # move after the first character in the comment
         index += 2
 
-        while str[index] != '*' and str[index + 1] != '/':
+        while not (str[index] == '*' and str[index + 1] == '/'):
             index += 1
 
         # move after the first character after the comment
