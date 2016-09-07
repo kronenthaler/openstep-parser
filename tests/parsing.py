@@ -108,6 +108,14 @@ class Parsing(unittest.TestCase):
 
         assert result['KEY-NAME'] == 'value\n"1234"'
 
+    def testDictionaryEntryTabQuoted(self):
+        parser = osp.OpenStepDecoder()
+        line = '    /* some comments */ KEY-NAME   /* asd */ =   /* adfasdf */  "\\t pre\\t \\tsuf pre\\tsuf \\t"    /* adfasdf */   ;'
+        result = {}
+        index = parser._parse_dictionary_entry(line, 0, result)
+
+        assert result['KEY-NAME'] == '\t pre\t \tsuf pre\tsuf \t'
+
     def testDictionaryEntryMissingEqual(self):
         parser = osp.OpenStepDecoder()
         line = '    /* some comments */ KEY-NAME   /* asd */    /* adfasdf */  value-1234    /* adfasdf */   ;'
