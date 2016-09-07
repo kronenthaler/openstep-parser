@@ -131,7 +131,7 @@ class OpenStepDecoder:
             # if the literal starts with " then spaces are allowed
             escaped = False
             while index < len(str) and (escaped or str[index] != '"'):
-                d = {'"': '"', "'": "'", "0": "\0", "\\": "\\", "n":"\n"}
+                d = {'"': '"', "'": "'", "0": "\0", "\\": "\\", "n":"\n", "t":"\t"}
                 if escaped:
                     key += d[str[index]]
                     escaped = False
