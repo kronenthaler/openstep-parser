@@ -102,7 +102,7 @@ class Parsing(unittest.TestCase):
 
     def testDictionaryEntryQuoted(self):
         parser = osp.OpenStepDecoder()
-        line = '    /* some comments */ KEY-NAME   /* asd */ =   /* adfasdf */  "value\\n\\"1234\\""    /* adfasdf */   ;'
+        line = '    /* some comments */ KEY-NAME   /* asd */ =   /* adfasdf */  "value\\n\\"1234\\""   /* adfasdf */  ;'
         result = {}
         index = parser._parse_dictionary_entry(line, 0, result)
 
