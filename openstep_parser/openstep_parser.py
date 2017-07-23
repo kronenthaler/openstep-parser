@@ -22,10 +22,11 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from builtins import object
 import re
 
 
-class OpenStepDecoder:
+class OpenStepDecoder(object):
     @classmethod
     def ParseFromFile(cls, fp):
         return cls.ParseFromString(fp.read())
