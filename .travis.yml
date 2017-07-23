@@ -6,6 +6,7 @@ script: nosetests tests/*
 deploy:
   provider: pypi
   user: kronenthaler
+  server: https://upload.pypi.org/legacy/
   password:
     secure: oDDhXGZOSAcV0CoVwwzGiEySXXQP1Jbzvt0NY7HvAkI9dH8DCxK4KYAaNqmrTpyPcAmELQPyjTL3TdcsH/YPzyAkF+kXSOMmoZuCRmjdYyyRqwiXybXt8OL9BDJ2QTgnEn890C9dYHBiA4lFd4yY3Q5WhCldOgDgZUrK4LSDtRK+vIvhhOS5yPGC48vd+VXF4Lrbrfwdgg3jY8qVz/Fk8KGv5DbpnANls9Ha5kYZRCins1NBaE1mdfe6JQx+Xt24W5KZnL4SK3qe1reQVjrNTjUYdG24TVow/ec70Zs8Bp7by6hxnCad39j3Tb6dw4A2G4CHLA9Q4/hC8VF7u5g3wVDDCyPbsF7sk+EejRhaGP0n418pCQuQMx3ZFOuWRJJ1aefBCi7FgHry0HVImhL7frpkR5CCW9iqQuTyYcG9LemOC6dvNT6aA/PsccAU7MNtRlk4g1q4tnORs/8SR2LcAAWdcsOAaQ58R4RFl5vdAp6wZH717mb6ZsELFOA+Jwlf29W4dc6U4APjWsK73J+M8aKlHzdY02qCwe/Hhy7oJEGomrUT/DzZlS+abc6DJsNptuSSamrnnd5dgm8jlcvzgzfTupuA5V/YUzVZJUDiVlBKU3u9O2M9U4xqabjL6ikCO84RAXAALi9+KjYgIvB7sHq6tC8vZj2/Cp+s+U5wMbQ=
   on:
