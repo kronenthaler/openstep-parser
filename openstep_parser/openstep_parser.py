@@ -30,12 +30,17 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import object
 import re
+import sys
 
 
 class OpenStepDecoder(object):
     @classmethod
     def ParseFromFile(cls, fp):
-        return cls.ParseFromString(fp.read().decode('UTF-8'))
+        # Check the python version to support unicode files in python 2
+        if sys.version_info > (3, 0):
+            return cls.ParseFromString(fp.read())
+        else:
+            return cls.ParseFromString(fp.read().decode('UTF-8'))
 
     @classmethod
     def ParseFromString(cls, str):
