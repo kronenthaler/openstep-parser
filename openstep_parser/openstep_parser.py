@@ -35,7 +35,7 @@ import re
 class OpenStepDecoder(object):
     @classmethod
     def ParseFromFile(cls, fp):
-        return cls.ParseFromString(fp.read())
+        return cls.ParseFromString(fp.read().decode('UTF-8'))
 
     @classmethod
     def ParseFromString(cls, str):
