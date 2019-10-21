@@ -97,20 +97,31 @@ class OpenStepDecoder(object):
         index = self._parse_padding(str, index + 1)
         value, index = self._parse_value(str, index)
 
+        dictionary[key] = value
+
+        if str[index] == '}':
+            # Let the caller know we're finished by NOT skipping the "}" from the stream.
+            return index
+
         if str[index] != ';':
             raise Exception("Expected ; after a value. Found {1} @ {0}".format(index, str[index]))
 
-        dictionary[key] = value
+        # Skip the ";" character.
         return index + 1
 
     def _parse_array_entry(self, str, index, array):
         # parse a: dict, array or value until the ','
         value, index = self._parse_value(str, index)
 
+        array.append(value)
+
+        if str[index] == ')':
+            # Let the caller know we're finished by NOT skipping the ")" from the stream.
+            return index
+
         if str[index] != ',':
             raise Exception("Expected , after a value. Found {1} @ {0} = {2}".format(index, str[index], value))
 
-        array.append(value)
         return index + 1
 
     def _parse_padding(self, str, index):
@@ -156,7 +167,7 @@ class OpenStepDecoder(object):
             index += 1
         else:
             # otherwise stop in the spaces.
-            while index < len(str) and not self._is_whitespace(str[index]) and str[index] != ';' and str[index] != ',':
+            while index < len(str) and not self._is_whitespace(str[index]) and str[index] not in (';', ',', '}', ')'):
                 key += str[index]
                 index += 1
 

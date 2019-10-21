@@ -143,6 +143,30 @@ class Parsing(unittest.TestCase):
         except Exception:
             pass
 
+    def testFullDictionary(self):
+        parser = osp.OpenStepDecoder()
+        line = '{ ' \
+               '    /* some comments */ KEY-NAME1   /* asd */  =  /* adfasdf */  value-1234    /* adfasdf */ ;  ' \
+               '    /* some comments */ KEY-NAME2   /* asd */  =  /* adfasdf */  value-5678    /* adfasdf */ ;  ' \
+               '}'
+        result, index = parser._parse_dictionary(line, 0)
+        assert len(result) == 2
+        assert result['KEY-NAME1'] == 'value-1234'
+        assert result['KEY-NAME2'] == 'value-5678'
+
+    def testFullDictionaryWithoutEndingSemicolon(self):
+        # Note that there's no semicolon between value-5678 and "}".
+        parser = osp.OpenStepDecoder()
+        line = '{ ' \
+               '    /* some comments */ KEY-NAME1   /* asd */  =  /* adfasdf */  value-1234    /* adfasdf */ ;  ' \
+               '    /* some comments */ KEY-NAME2   /* asd */  =  /* adfasdf */  value-5678' \
+               '}'
+        result, index = parser._parse_dictionary(line, 0)
+        assert len(result) == 2
+        assert result['KEY-NAME1'] == 'value-1234'
+        assert result['KEY-NAME2'] == 'value-5678'
+
+
     def testArrayEntry(self):
         parser = osp.OpenStepDecoder()
         line = '    /* some comments */ KEY-NAME   /* asd */  , '
@@ -159,6 +183,21 @@ class Parsing(unittest.TestCase):
                '    GHI,' \
                ')'
         result, index = parser._parse_array(line, 0)
+        assert len(result) == 3
+        assert result[0] == 'ABC'
+        assert result[1] == 'DEF'
+        assert result[2] == 'GHI'
+
+    def testFullArrayWithoutEndingComma(self):
+        # Note that there's no comma between GHI and ")".
+        parser = osp.OpenStepDecoder()
+        line = '( ' \
+               '    ABC,' \
+               '    DEF,' \
+               '    GHI'  \
+               ')'
+        result, index = parser._parse_array(line, 0)
+        assert len(result) == 3
         assert result[0] == 'ABC'
         assert result[1] == 'DEF'
         assert result[2] == 'GHI'
