@@ -116,7 +116,7 @@ class OpenStepDecoder(object):
         array.append(value)
 
         if str[index] == ')':
-            # Let the caller know we're finished by NOT skipping the "]" from the stream.
+            # Let the caller know we're finished by NOT skipping the ")" from the stream.
             return index
 
         if str[index] != ',':
