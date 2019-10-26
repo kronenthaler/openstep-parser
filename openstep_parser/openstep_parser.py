@@ -29,8 +29,13 @@ from __future__ import absolute_import
 from future import standard_library
 standard_library.install_aliases()
 from builtins import object
-import re
 import sys
+
+
+_WHITESPACE = frozenset(' \t\n\r')
+_UNQUOTED_LITERAL_ENDER = frozenset(';,})').union(_WHITESPACE)
+_KEY_ENDER = frozenset(';').union(_WHITESPACE)
+_LITERAL_ESCAPES = {'\\"': '"', "\\'": "'", "\\0": "\0", "\\\\": "\\", "\\n": "\n", "\\t": "\t"}
 
 
 class OpenStepDecoder(object):
@@ -125,51 +130,67 @@ class OpenStepDecoder(object):
         return index + 1
 
     def _parse_padding(self, str, index):
-        index = self._ignore_whitespaces(str, index)
-        index = self._ignore_comment(str, index)
-        index = self._ignore_whitespaces(str, index)
+        str_len = len(str)
+
+        # Ignore whitespace
+        while index < str_len and str[index] in _WHITESPACE:
+            index += 1
+
+        # Ignore comment
+        if index + 1 < str_len and str[index] == '/' and str[index + 1] == '*':
+            # move after the first character in the comment
+            index += 2
+
+            while not (str[index] == '*' and str[index + 1] == '/'):
+                index += 1
+
+            # move after the first character after the comment
+            index += 2
+
+        # Ignore whitespace
+        while index < str_len and str[index] in _WHITESPACE:
+            index += 1
+
         return index
 
     def _parse_key(self, str, index):
         # returns the key and the last index.
         index = self._parse_padding(str, index)
 
-        key = ''
-        while index < len(str) and not self._is_whitespace(str[index]) and str[index] != ';':
-            key += str[index]
+        start_index = index
+        while str[index] not in _KEY_ENDER:
             index += 1
 
+        end_index = index
+        if str[start_index] == '"':
+            start_index += 1
+        if str[end_index-1] == '"':
+            end_index -= 1
+        key = str[start_index:end_index]
+
         index = self._parse_padding(str, index)
-        key = re.sub(r'^"', '', key)
-        key = re.sub(r'"$', '', key)
         return key, index
 
     def _parse_literal(self, str, index):
         # returns the key and the last index.
         index = self._parse_padding(str, index)
-        key = ''
 
         if str[index] == '"':
             index += 1
             # if the literal starts with " then spaces are allowed
-            escaped = False
-            while index < len(str) and (escaped or str[index] != '"'):
-                d = {'"': '"', "'": "'", "0": "\0", "\\": "\\", "n": "\n", "t": "\t"}
-                if escaped:
-                    key += d[str[index]]
-                    escaped = False
-                elif not escaped and str[index] == '\\':
-                    escaped = True
-                else:
-                    key += str[index]
-                    escaped = False
+            start_index = index
+            while str[index] != '"' or str[index - 1] == "\\":
                 index += 1
+            key = str[start_index:index]
+            for escaped_value, real_value in _LITERAL_ESCAPES.items():
+                key = key.replace(escaped_value, real_value)
             index += 1
         else:
             # otherwise stop in the spaces.
-            while index < len(str) and not self._is_whitespace(str[index]) and str[index] not in (';', ',', '}', ')'):
-                key += str[index]
+            start_index = index
+            while str[index] not in _UNQUOTED_LITERAL_ENDER:
                 index += 1
+            key = str[start_index:index]
 
         index = self._parse_padding(str, index)
         return key, index
@@ -185,32 +206,3 @@ class OpenStepDecoder(object):
             value, index = self._parse_literal(str, index)
 
         return value, index
-
-    def _ignore_comment(self, str, index):
-        # moves the index, to the next character after the close of the comment
-
-        if index + 1 >= len(str) or (str[index] != '/' or str[index + 1] != '*'):
-            return index
-
-        # move after the first character in the comment
-        index += 2
-
-        while not (str[index] == '*' and str[index + 1] == '/'):
-            index += 1
-
-        # move after the first character after the comment
-        index += 2
-
-        return index
-
-    def _ignore_whitespaces(self, str, index):
-        while index < len(str) and self._is_whitespace(str[index]):
-            index += 1
-
-        return index
-
-    def _is_whitespace(self, char):
-        return char == ' ' or \
-               char == '\t' or \
-               char == '\n' or \
-               char == '\r'

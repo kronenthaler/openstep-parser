@@ -58,31 +58,22 @@ class Parsing(unittest.TestCase):
 
     def testIgnoreWhitespacesFromBeginning(self):
         parser = osp.OpenStepDecoder()
-        index = parser._ignore_whitespaces('   3 ', 0)
+        index = parser._parse_padding('   3 ', 0)
         assert index == 3
 
     def testIgnoreWhitespacesInTheMiddle(self):
         parser = osp.OpenStepDecoder()
-        index = parser._ignore_whitespaces('0   3 ', 1)
+        index = parser._parse_padding('0   3 ', 1)
         assert index == 4
-
-    def testIsWhitespace(self):
-        parser = osp.OpenStepDecoder()
-        assert not parser._is_whitespace('a')
-        assert not parser._is_whitespace('0')
-        assert parser._is_whitespace('\t')
-        assert parser._is_whitespace('\r')
-        assert parser._is_whitespace('\n')
-        assert parser._is_whitespace(' ')
 
     def testIgnoreComment(self):
         parser = osp.OpenStepDecoder()
-        index = parser._ignore_comment('/*12345/67890*/ ', 0)
-        assert index == 15
+        index = parser._parse_padding('/*12345/67890*/ a', 0)
+        assert index == 16
 
     def testIgnoreFakeComment(self):
         parser = osp.OpenStepDecoder()
-        index = parser._ignore_comment('/bin/sh/ ', 0)
+        index = parser._parse_padding('/bin/sh/ ', 0)
         assert index == 0
 
     def testParsingKey(self):
