@@ -1,0 +1,37 @@
+name: branch-check
+on: [push, pull_request]
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        id: checkout
+        
+      - name: Setup
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.5.x'
+          
+      - name: Dependencies
+        run: |
+          pip install .
+          pip install coveralls
+          pip install codacy-coverage
+          pip install nose
+          
+      - name: Test
+        run: |
+          coverage run setup.py test
+          coverage xml
+        
+      - name: Coveralls
+        run: coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+      
+      - name: Codacy
+        run: python-codacy-coverage -r coverage.xml
+        env: 
+          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
