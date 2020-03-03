@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
-import os
+
 
 # Inspired by the example at https://pytest.org/latest/goodpractises.html
 class NoseTestCommand(TestCommand):
