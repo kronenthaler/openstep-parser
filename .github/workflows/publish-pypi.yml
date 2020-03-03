@@ -1,9 +1,9 @@
-name: publish
+name: publish to pypi
 on: 
   release:
     types: [created]
 jobs:
-  release:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
