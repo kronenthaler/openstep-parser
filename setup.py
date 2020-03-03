@@ -26,6 +26,7 @@ class NoseTestCoverage(TestCommand):
         import nose
         nose.run_exit(argv=['nosetests',
                             '--with-coverage',
+                            '--cover-xml',
                             '--cover-erase',
                             '--cover-branches',
                             '--cover-package=openstep_parser'])

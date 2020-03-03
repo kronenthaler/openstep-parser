@@ -22,8 +22,7 @@ jobs:
 
       - name: Test
         run: |
-          coverage run setup.py test
-          coverage xml
+          python setup.py coverage
 
       - name: Coveralls
         run: coveralls
