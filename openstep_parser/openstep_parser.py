@@ -28,7 +28,7 @@ import sys
 
 _WHITESPACE = frozenset(' \t\n\r')
 _UNQUOTED_LITERAL_ENDER = frozenset(';,})').union(_WHITESPACE)
-_KEY_ENDER = frozenset(';').union(_WHITESPACE)
+_KEY_ENDER = frozenset(';=').union(_WHITESPACE)
 _LITERAL_ESCAPES = {'\\"': '"', "\\'": "'", "\\0": "\0", "\\\\": "\\", "\\n": "\n", "\\t": "\t"}
 
 
@@ -152,14 +152,18 @@ class OpenStepDecoder(object):
         index = self._parse_padding(str, index)
 
         start_index = index
-        while str[index] not in _KEY_ENDER:
+        if str[index] == '"':
             index += 1
-
-        end_index = index
-        if str[start_index] == '"':
+            while str[index] != '"':
+                index += 1
             start_index += 1
-        if str[end_index-1] == '"':
-            end_index -= 1
+            end_index = index
+            index += 1
+        else:
+            while str[index] not in _KEY_ENDER:
+                index += 1
+            end_index = index
+
         key = str[start_index:end_index]
 
         index = self._parse_padding(str, index)

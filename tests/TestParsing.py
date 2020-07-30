@@ -50,6 +50,10 @@ class Parsing(unittest.TestCase):
         result = osp.OpenStepDecoder.ParseFromFile(open('tests/samples/metal-image-processing.pbxproj'))
         assert result
 
+    def testParseFileSample5(self):
+        result = osp.OpenStepDecoder.ParseFromFile(open('tests/samples/no_whitespace.pbxproj'))
+        assert result
+
     def testIgnoreWhitespacesFromBeginning(self):
         parser = osp.OpenStepDecoder()
         index = parser._parse_padding('   3 ', 0)
