@@ -37,11 +37,6 @@ jobs:
         run: |
           python setup.py coverage
 
-      - name: Coveralls
-        run: coveralls
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-
       - name: Codacy
         run: python-codacy-coverage -r coverage.xml
         env:
