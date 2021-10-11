@@ -14,7 +14,7 @@ jobs:
     
     strategy:
       matrix:
-        python: ['3.6', '3.7', '3.8']
+        python: ['3.6', '3.7', '3.8', '3.9']
     
     steps:
       - name: Checkout
@@ -27,17 +27,14 @@ jobs:
           python-version: ${{ matrix.python }}
 
       - name: Dependencies
-        run: |
-          pip install .
-          pip install codacy-coverage
-          pip install nose
-          pip install coveralls
+        run: pip install .
 
       - name: Test
-        run: |
-          python setup.py coverage
+        run: python setup.py coverage
 
       - name: Codacy
-        run: python-codacy-coverage -r coverage.xml
-        env:
-          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        if: github.event_name != 'pull_request'
+        uses: codacy/codacy-coverage-reporter-action@v1
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: coverage.xml
