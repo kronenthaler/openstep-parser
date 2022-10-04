@@ -27,10 +27,10 @@ jobs:
           python-version: ${{ matrix.python }}
 
       - name: Dependencies
-        run: pip install .
+        run: pip install -r dev-requirements.txt
 
       - name: Test
-        run: python setup.py coverage
+        run: make coverage
 
       - name: Codacy
         if: github.event_name != 'pull_request'
