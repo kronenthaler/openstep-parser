@@ -14,7 +14,7 @@ jobs:
     
     strategy:
       matrix:
-        python: ['3.8', '3.9']
+        python: ['3.8', '3.9', '3.10', '3.11', '3.x']
     
     steps:
       - name: Checkout
@@ -32,9 +32,48 @@ jobs:
       - name: Test
         run: make coverage
 
-      - name: Codacy
-        if: github.event_name != 'pull_request'
-        uses: codacy/codacy-coverage-reporter-action@v1
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        if: github.event_name == 'pull_request' && matrix.python == '3.x'
         with:
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: coverage.xml
+          args: >
+            -Dsonar.projectVersion=${{ env.VERSION }}
+            -Dsonar.pullrequest.key=${{ github.event.number }}
+            -Dsonar.pullrequest.branch=${{ github.event.pull_request.head.ref }}
+            -Dsonar.pullrequest.base=${{ github.event.pull_request.base.ref  }}
+            -Dsonar.organization=kronenthaler
+            -Dsonar.projectKey=kronenthaler_openstep-parser
+            -Dsonar.projectName=openstep-parser
+            -Dsonar.python.version=3
+            -Dsonar.python.coverage.reportPaths=tests/coverage.xml
+            -Dsonar.sources=openstep_parser/
+            -Dsonar.tests=tests/
+            -Dsonar.verbose=true
+            -Dsonar.c.file.suffixes=-
+            -Dsonar.cpp.file.suffixes=-
+            -Dsonar.objc.file.suffixes=-
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        if: github.event_name == 'push' && matrix.python == '3.x'
+        with:
+          args: >
+            -Dsonar.projectVersion=${{ env.VERSION }}
+            -Dsonar.branch.name=${{ github.ref_name }}
+            -Dsonar.organization=kronenthaler
+            -Dsonar.projectKey=kronenthaler_openstep-parser
+            -Dsonar.projectName=openstep-parser
+            -Dsonar.python.version=3
+            -Dsonar.python.coverage.reportPaths=tests/coverage.xml
+            -Dsonar.sources=openstep_parser/
+            -Dsonar.tests=tests/
+            -Dsonar.verbose=true
+            -Dsonar.c.file.suffixes=-
+            -Dsonar.cpp.file.suffixes=-
+            -Dsonar.objc.file.suffixes=-
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
