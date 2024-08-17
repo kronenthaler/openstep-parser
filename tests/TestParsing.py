@@ -35,23 +35,23 @@ class ParsingTest(unittest.TestCase):
         assert result
 
     def testParseFileSample1(self):
-        result = osp.OpenStepDecoder.ParseFromFile(open('samples/music-cube.pbxproj'))
+        result = osp.OpenStepDecoder.ParseFromFile(open('tests/samples/music-cube.pbxproj'))
         assert result
 
     def testParseFileSample2(self):
-        result = osp.OpenStepDecoder.ParseFromFile(open('samples/cloud-search.pbxproj'))
+        result = osp.OpenStepDecoder.ParseFromFile(open('tests/samples/cloud-search.pbxproj'))
         assert result
 
     def testParseFileSample3(self):
-        result = osp.OpenStepDecoder.ParseFromFile(open('samples/collection-view.pbxproj'))
+        result = osp.OpenStepDecoder.ParseFromFile(open('tests/samples/collection-view.pbxproj'))
         assert result
 
     def testParseFileSample4(self):
-        result = osp.OpenStepDecoder.ParseFromFile(open('samples/metal-image-processing.pbxproj'))
+        result = osp.OpenStepDecoder.ParseFromFile(open('tests/samples/metal-image-processing.pbxproj'))
         assert result
 
     def testParseFileSample5(self):
-        result = osp.OpenStepDecoder.ParseFromFile(open('samples/no_whitespace.pbxproj'))
+        result = osp.OpenStepDecoder.ParseFromFile(open('tests/samples/no_whitespace.pbxproj'))
         assert result
 
     def testIgnoreWhitespacesFromBeginning(self):
