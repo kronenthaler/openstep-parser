@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
 
+try:
+    long_description = open("README.md").read()
+except IOError:
+    long_description = ""
 
 def find_version(*file_paths):
     def read(*parts):
@@ -24,6 +28,7 @@ setup(
     author='Ignacio Calderon',
     description='OpenStep plist reader into python objects',
     long_description=long_description,
+    long_description_content_type='text/markdown',
     url="http://github.com/kronenthaler/openstep-parser",
     version=find_version("openstep_parser", "__init__.py"),
     license='BSD License',
