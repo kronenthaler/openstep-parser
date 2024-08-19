@@ -23,35 +23,39 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+import os
+from os.path import join
 import unittest
 
 from openstep_parser import openstep_parser as osp
 
 
 class ParsingTest(unittest.TestCase):
+    PWD = os.path.dirname(os.path.abspath(__file__))
+
     def testParseNestedDictionary(self):
         line = '''{ a = { b = b1; }; };'''
         result = osp.OpenStepDecoder()._parse_dictionary(line, 0)
         assert result
 
     def testParseFileSample1(self):
-        result = osp.OpenStepDecoder.ParseFromFile(open('samples/music-cube.pbxproj'))
+        result = osp.OpenStepDecoder.ParseFromFile(open(join(self.PWD, 'samples/music-cube.pbxproj')))
         assert result
 
     def testParseFileSample2(self):
-        result = osp.OpenStepDecoder.ParseFromFile(open('samples/cloud-search.pbxproj'))
+        result = osp.OpenStepDecoder.ParseFromFile(open(join(self.PWD, 'samples/cloud-search.pbxproj')))
         assert result
 
     def testParseFileSample3(self):
-        result = osp.OpenStepDecoder.ParseFromFile(open('samples/collection-view.pbxproj'))
+        result = osp.OpenStepDecoder.ParseFromFile(open(join(self.PWD, 'samples/collection-view.pbxproj')))
         assert result
 
     def testParseFileSample4(self):
-        result = osp.OpenStepDecoder.ParseFromFile(open('samples/metal-image-processing.pbxproj'))
+        result = osp.OpenStepDecoder.ParseFromFile(open(join(self.PWD, 'samples/metal-image-processing.pbxproj')))
         assert result
 
     def testParseFileSample5(self):
-        result = osp.OpenStepDecoder.ParseFromFile(open('samples/no_whitespace.pbxproj'))
+        result = osp.OpenStepDecoder.ParseFromFile(open(join(self.PWD, 'samples/no_whitespace.pbxproj')))
         assert result
 
     def testIgnoreWhitespacesFromBeginning(self):
