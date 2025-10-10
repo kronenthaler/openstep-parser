@@ -1,0 +1,10 @@
+[project]
+name = "openstep-parser"
+description = "OpenStep plist reader into python objects"
+dynamic = ["version"]
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "Ignacio Calderon" }
+]
+requires-python = ">= 3.10"
