@@ -27,11 +27,7 @@ setup(
     name='openstep_parser',
     author='Ignacio Calderon',
     description='OpenStep plist reader into python objects',
-    long_description=long_description,
-    long_description_content_type='text/markdown',
     url="http://github.com/kronenthaler/openstep-parser",
     version=find_version("openstep_parser", "__init__.py"),
-    license='BSD License',
-    python_requires='>=3.8',
     packages=find_packages(exclude=['tests'])
 )
